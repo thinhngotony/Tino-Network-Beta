@@ -1,10 +1,10 @@
 const ChainUtil = require('../chain-util');
 const Transaction = require('./transaction');
-const { INITIAL_BALANCE } = require('../config');
+const { INITIAL_status } = require('../config');
 
 class Wallet {
   constructor() {
-    this.balance = INITIAL_BALANCE;
+    this.status = INITIAL_status;
     this.keyPair = ChainUtil.genKeyPair();
     this.publicKey = this.keyPair.getPublic().encode('hex');
   }
@@ -12,35 +12,35 @@ class Wallet {
   toString() {
     return `Wallet -
       publicKey: ${this.publicKey.toString()}
-      balance  : ${this.balance}`
+      status  : ${this.status}`
   }
 
   sign(dataHash) {
     return this.keyPair.sign(dataHash);
   }
 
-  createTransaction(recipient, amount, blockchain, transactionPool) {
-    this.balance = this.calculateBalance(blockchain);
+  createTransaction(recipient, statusNow, blockchain, transactionPool) {
+    this.status = this.calculatestatus(blockchain);
 
-    if (amount > this.balance) {
-      console.log(`Amount: ${amount} exceceds current balance: ${this.balance}`);
+    if (statusNow > this.status) {
+      console.log(`statusNow: ${statusNow} exceceds current status: ${this.status}`);
       return;
     }
 
     let transaction = transactionPool.existingTransaction(this.publicKey);
 
     if (transaction) {
-      transaction.update(this, recipient, amount);
+      transaction.update(this, recipient, statusNow);
     } else {
-      transaction = Transaction.newTransaction(this, recipient, amount);
+      transaction = Transaction.newTransaction(this, recipient, statusNow);
       transactionPool.updateOrAddTransaction(transaction);
     }
 
     return transaction;
   }
 
-  calculateBalance(blockchain) {
-    let balance = this.balance;
+  calculatestatus(blockchain) {
+    let status = this.status;
     let transactions = [];
     blockchain.chain.forEach(block => block.data.forEach(transaction => {
       transactions.push(transaction);
@@ -56,7 +56,7 @@ class Wallet {
         (prev, current) => prev.input.timestamp > current.input.timestamp ? prev : current
       );
 
-      balance = recentInputT.outputs.find(output => output.address === this.publicKey).amount;
+      status = recentInputT.outputs.find(output => output.address === this.publicKey).statusNow;
       startTime = recentInputT.input.timestamp;
     }
 
@@ -64,13 +64,13 @@ class Wallet {
       if (transaction.input.timestamp > startTime) {
         transaction.outputs.find(output => {
           if (output.address === this.publicKey) {
-            balance += output.amount;
+            status = output.statusNow;
           }
         });
       }
     });
 
-    return balance;
+    return status;
   }
 
   static blockchainWallet() {

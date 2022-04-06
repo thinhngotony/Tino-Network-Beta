@@ -8,16 +8,16 @@ class Transaction {
     this.outputs = [];
   }
 
-  update(senderWallet, recipient, amount) {
+  update(senderWallet, recipient, statusNow) {
     const senderOutput = this.outputs.find(output => output.address === senderWallet.publicKey);
 
-    if (amount > senderOutput.amount) {
-      console.log(`Amount: ${amount} exceeds balance.`);
+    if (statusNow > senderOutput.statusNow) {
+      console.log(`statusNow: ${statusNow} exceeds status.`);
       return;
     }
 
-    senderOutput.amount = senderOutput.amount - amount;
-    this.outputs.push({ amount, address: recipient });
+    senderOutput.statusNow = senderOutput.statusNow - statusNow;
+    this.outputs.push({ statusNow, address: recipient });
     Transaction.signTransaction(this, senderWallet);
 
     return this;
@@ -30,28 +30,28 @@ class Transaction {
     return transaction;
   }
 
-  static newTransaction(senderWallet, recipient, amount) {
-    if (amount > senderWallet.balance) {
-      console.log(`Amount: ${amount} exceeds balance.`);
+  static newTransaction(senderWallet, recipient, statusNow) {
+    if (statusNow > senderWallet.status) {
+      console.log(`statusNow: ${statusNow} exceeds status.`);
       return;
     }
 
     return Transaction.transactionWithOutputs(senderWallet, [
-      { amount: senderWallet.balance - amount, address: senderWallet.publicKey },
-      { amount, address: recipient }
+      { statusNow: senderWallet.status - statusNow, address: senderWallet.publicKey },
+      { statusNow, address: recipient }
     ]);
   }
 
   static rewardTransaction(minerWallet, blockchainWallet) {
     return Transaction.transactionWithOutputs(blockchainWallet, [{
-      amount: MINING_REWARD, address: minerWallet.publicKey
+      statusNow: MINING_REWARD, address: minerWallet.publicKey
     }]);
   }
 
   static signTransaction(transaction, senderWallet) {
     transaction.input = {
       timestamp: Date.now(),
-      amount: senderWallet.balance,
+      statusNow: senderWallet.status,
       address: senderWallet.publicKey,
       signature: senderWallet.sign(ChainUtil.hash(transaction.outputs))
     }
