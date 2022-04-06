@@ -1,10 +1,10 @@
 const ChainUtil = require('../chain-util');
 const Transaction = require('./transaction');
-const { INITIAL_status } = require('../config');
+const { INITIAL_STATUS } = require('../config');
 
 class Wallet {
   constructor() {
-    this.status = INITIAL_status;
+    this.status = INITIAL_STATUS;
     this.keyPair = ChainUtil.genKeyPair();
     this.publicKey = this.keyPair.getPublic().encode('hex');
   }
