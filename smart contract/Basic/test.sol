@@ -1,13 +1,27 @@
 pragma solidity >=0.4.0 <0.9.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+
 contract Job is Ownable{
 
+    //Delete renounceOwnership default function - reject Ownership function
 
-    mapping (address => JobStatus) public statusView;
+    function renounceOwnership() public override onlyOwner{
+        revert("I don't want this!");
+    }
+
+    //End function
 
 
     enum JobStatus {Free, Working, Applying}
+
+    struct Person{
+        string id; 
+        JobStatus status;
+        
+    }
+
+    mapping (address => Person) public statusView;
 
     JobStatus private status;
 
@@ -17,8 +31,9 @@ contract Job is Ownable{
         status = JobStatus.Free;
     }
 
-    function Applying (address _to) public {
-        status = JobStatus.Applying;
+
+    function Applying (address _from, address _to) public {
+        msg.sender[status] = JobStatus.Applying;
         emit LogNewAlert(msg.sender, "Applying for ", _to);
     }
 
@@ -46,7 +61,19 @@ contract Job is Ownable{
         JobStatus _JobStatus = status;
         return getStatus(_JobStatus);
     }
+    
 
+}
+
+// contract Company{
+//     uint public index;
+
+//     Job parentContract;
+//     constructor()
+
+//     received() external payable{
+//         address(parentContract).call.
+//     }
 }
 
 

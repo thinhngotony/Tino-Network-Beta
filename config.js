@@ -2,6 +2,7 @@ const DIFFICULTY = 3;
 const MINE_RATE = 3000;
 const INITIAL_BALANCE = 500;
 const MINING_REWARD = 50;
-const INITIAL_STATUS = null;
+// const INITIAL_STATUS = null;
+const INITIAL_STATUS = "Pending";
 
 module.exports = { DIFFICULTY, MINE_RATE, INITIAL_BALANCE, MINING_REWARD,INITIAL_STATUS };
